@@ -2,26 +2,79 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Emploi du Temps</title>
     <style>
-        body, html {
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+        
+        body, html {
+            width: 100%;
             height: 100%;
             overflow: hidden;
+            background-color: #f5f5f5;
         }
-        iframe {
+        
+        .pdf-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
             border: none;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Amélioration pour les petits écrans */
+        @media (max-width: 768px) {
+            .pdf-container {
+                padding: 0;
+            }
+            
+            iframe {
+                transform-origin: top left;
+                transform: scale(1);
+                max-width: 100%;
+                height: auto;
+                min-height: 100vh;
+            }
+        }
+        
+        /* Mode paysage sur mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .pdf-container {
+                padding: 0;
+            }
+            
+            iframe {
+                width: 100%;
+                height: 100%;
+                max-height: 100vh;
+            }
         }
     </style>
 </head>
 <body>
-    <iframe src="EMPLOI DU TEMPS ICT4D & MASTER PRO_S1_2025-2026_V5.pdf#view=FitH" type="application/pdf"></iframe>
+    <div class="pdf-container">
+        <iframe src="EMPLOI DU TEMPS ICT4D & MASTER PRO_S1_2025-2026_V5.pdf#view=FitH" 
+                type="application/pdf" 
+                allowfullscreen 
+                webkitallowfullscreen></iframe>
+    </div>
 </body>
 </html>
