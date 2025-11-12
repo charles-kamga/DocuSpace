@@ -1,34 +1,212 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>DocuSpace - Accueil</title>
-</head>
-<body>
-<h1>📁 Mes Dossiers</h1>
+{% extends 'files/base.html' %}
 
-{% for folder in folders %}
-    <h2>{{ folder.name }}</h2>
-    <ul>
-        {% for doc in folder.documents.all %}
-            <li>{{ doc.title }} - <a href="{{ doc.file.url }}">Télécharger</a></li>
-        {% empty %}
-            <li>Aucun document dans ce dossier.</li>
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- En-tête avec actions principales -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0"><i class="fas fa-folder-open text-primary me-2"></i> Mes Dossiers</h1>
+        <div class="d-flex gap-2">
+            <a href="{% url 'create_folder' %}" class="btn btn-primary">
+                <i class="fas fa-folder-plus me-1"></i> Nouveau dossier
+            </a>
+            <a href="{% url 'upload_document' %}" class="btn btn-success">
+                <i class="fas fa-upload me-1"></i> Téléverser
+            </a>
+        </div>
+    </div>
+
+    <!-- Grille des dossiers -->
+    {% if folders %}
+    <div class="row g-4 mb-5">
+        {% for folder in folders %}
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm hover-shadow">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-folder text-warning me-2"></i>
+                        <h5 class="mb-0 text-truncate" style="max-width: 200px;" title="{{ folder.name }}">
+                            {{ folder.name }}
+                        </h5>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-link text-muted p-0" type="button" 
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'rename_folder' folder.id %}">
+                                    <i class="fas fa-edit me-2 text-primary"></i>Renommer
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" 
+                                   href="{% url 'delete_folder' folder.id %}"
+                                   data-confirm="Êtes-vous sûr de vouloir supprimer ce dossier et tout son contenu ?">
+                                    <i class="fas fa-trash-alt me-2"></i>Supprimer
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if folder.documents.all %}
+                        <ul class="list-group list-group-flush">
+                            {% for doc in folder.documents.all|slice:":5" %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="text-truncate me-2" style="max-width: 200px;" title="{{ doc.title }}">
+                                    <i class="fas {{ doc.file.url|lower|yesno:'fa-file-pdf text-danger,fa-file-alt text-primary' }} me-2"></i>
+                                    {{ doc.title }}
+                                </div>
+                                <div class="btn-group">
+                                    <a href="{{ doc.file.url }}" class="btn btn-sm btn-outline-success" 
+                                       data-bs-toggle="tooltip" title="Télécharger">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <a href="{% url 'move_document' doc.id %}" class="btn btn-sm btn-outline-primary"
+                                       data-bs-toggle="tooltip" title="Déplacer">
+                                        <i class="fas fa-arrows-alt"></i>
+                                    </a>
+                                    <a href="{% url 'delete_document' doc.id %}" 
+                                       class="btn btn-sm btn-outline-danger"
+                                       data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"
+                                       data-bs-toggle="tooltip" title="Supprimer">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </li>
+                            {% endfor %}
+                            {% if folder.documents.count > 5 %}
+                            <li class="list-group-item text-center text-muted small">
+                                + {{ folder.documents.count|add:"-5" }} autre{{ folder.documents.count|add:"-5"|pluralize:"s" }} document{{ folder.documents.count|add:"-5"|pluralize:"s" }}
+                            </li>
+                            {% endif %}
+                        </ul>
+                    {% else %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                            <p class="mb-0">Dossier vide</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-white border-top-0 pt-0 text-end">
+                    <a href="{% url 'view_folder' folder.id %}" class="btn btn-sm btn-outline-primary">
+                        Voir tout <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
-{% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5 my-5">
+        <div class="mb-4">
+            <i class="fas fa-folder-open fa-4x text-muted mb-3"></i>
+            <h3 class="h5">Aucun dossier pour le moment</h3>
+            <p class="text-muted">Commencez par créer un dossier pour organiser vos documents</p>
+        </div>
+        <a href="{% url 'create_folder' %}" class="btn btn-primary">
+            <i class="fas fa-folder-plus me-1"></i> Créer un dossier
+        </a>
+    </div>
+    {% endif %}
 
-<h2>📄 Documents sans dossier</h2>
-<ul>
-    {% for doc in documents_without_folder %}
-        <li>{{ doc.title }} - <a href="{{ doc.file.url }}">Télécharger</a></li>
-    {% empty %}
-        <li>Aucun document.</li>
-    {% endfor %}
-</ul>
+    <!-- Documents sans dossier -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-file-alt text-muted me-2"></i> Documents sans dossier
+                {% if documents_without_folder %}
+                    <span class="badge bg-secondary ms-2">{{ documents_without_folder|length }}</span>
+                {% endif %}
+            </h5>
+            {% if documents_without_folder %}
+            <button class="btn btn-sm btn-link" type="button" data-bs-toggle="collapse" 
+                    data-bs-target="#documentsWithoutFolder" aria-expanded="true">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            {% endif %}
+        </div>
+        
+        {% if documents_without_folder %}
+        <div class="collapse show" id="documentsWithoutFolder">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <tbody>
+                        {% for doc in documents_without_folder %}
+                        <tr>
+                            <td class="align-middle" style="width: 40px;">
+                                <i class="fas {{ doc.file.url|lower|yesno:'fa-file-pdf text-danger,fa-file-alt text-primary' }}"></i>
+                            </td>
+                            <td class="align-middle text-truncate" style="max-width: 300px;" title="{{ doc.title }}">
+                                {{ doc.title }}
+                            </td>
+                            <td class="text-muted small align-middle d-none d-md-table-cell">
+                                {{ doc.uploaded_at|date:"d/m/Y H:i" }}
+                            </td>
+                            <td class="text-muted small align-middle d-none d-lg-table-cell">
+                                {{ doc.file.size|filesizeformat }}
+                            </td>
+                            <td class="text-end align-middle">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ doc.file.url }}" target="_blank" class="btn btn-outline-primary" 
+                                       data-bs-toggle="tooltip" title="Ouvrir">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ doc.file.url }}" class="btn btn-outline-success" 
+                                       data-bs-toggle="tooltip" title="Télécharger">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <a href="{% url 'move_document' doc.id %}" class="btn btn-outline-info"
+                                       data-bs-toggle="tooltip" title="Déplacer">
+                                        <i class="fas fa-arrows-alt"></i>
+                                    </a>
+                                    <a href="{% url 'rename_document' doc.id %}" class="btn btn-outline-secondary"
+                                       data-bs-toggle="tooltip" title="Renommer">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'delete_document' doc.id %}" 
+                                       class="btn btn-outline-danger"
+                                       data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"
+                                       data-bs-toggle="tooltip" title="Supprimer">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
+            <p class="text-muted mb-0">Tous vos documents sont bien rangés dans des dossiers !</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
 
-<a href="{% url 'create_folder' %}">+ Créer un nouveau dossier</a><br>
-<a href="{% url 'upload_document' %}">Uploader un document</a>
+{% block extra_js %}
+<script>
+// Initialisation des tooltips
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+});
 
-</body>
-</html>
+// Gestion des confirmations de suppression
+document.querySelectorAll('[data-confirm]').forEach(function(element) {
+    element.addEventListener('click', function(e) {
+        if (!confirm(this.getAttribute('data-confirm'))) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

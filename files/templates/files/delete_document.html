@@ -1,0 +1,83 @@
+{% extends 'files/base.html' %}
+
+{% block title %}Supprimer le document - DocuSpace{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-trash-alt text-danger me-2"></i>Supprimer le document
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Êtes-vous sûr de vouloir supprimer définitivement ce document ?
+                    </div>
+                    
+                    <div class="document-preview mb-4 p-3 bg-light rounded-3">
+                        <div class="d-flex align-items-center">
+                            <div class="file-icon me-3">
+                                <i class="fas {{ document.file.url|lower|yesno:'fa-file-pdf text-danger,fa-file-alt text-primary' }}" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <div class="file-details">
+                                <h3 class="h5 mb-1">{{ document.title }}</h3>
+                                <div class="file-meta text-muted small">
+                                    <div class="d-flex flex-wrap gap-3">
+                                        <span class="d-flex align-items-center">
+                                            <i class="fas {{ document.folder|yesno:'fa-folder,fa-home' }} me-1"></i>
+                                            {% if document.folder %}
+                                                Dossier : <strong class="ms-1">{{ document.folder.name }}</strong>
+                                            {% else %}
+                                                <span class="ms-1">Racine (pas de dossier)</span>
+                                            {% endif %}
+                                        </span>
+                                        <span class="d-flex align-items-center">
+                                            <i class="far fa-calendar-alt me-1"></i>
+                                            Ajouté le {{ document.uploaded_at|date:"d/m/Y à H:i" }}
+                                        </span>
+                                        <span class="d-flex align-items-center">
+                                            <i class="far fa-file me-1"></i>
+                                            {{ document.file.size|filesizeformat }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt me-1"></i> Supprimer définitivement
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Désactive la soumission du formulaire si l'utilisateur clique sur Annuler
+document.addEventListener('DOMContentLoaded', function() {
+    const cancelButton = document.querySelector('.btn-outline-secondary');
+    if (cancelButton) {
+        cancelButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = this.getAttribute('href');
+        });
+    }
+});
+</script>
+{% endblock %}

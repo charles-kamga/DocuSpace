@@ -125,5 +125,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 import os
 
+# Configuration des médias
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Configuration des fichiers statiques
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# Configuration pour les fichiers statiques en production
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Configuration pour les icônes Font Awesome
+FONTAWESOME_5_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'
+FONTAWESOME_5_PREFIX = 'fa'

@@ -1,10 +1,16 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
-from .models import Folder, Document
+from django.forms import ModelForm
+from django.contrib import messages
+from django.http import HttpResponseForbidden, HttpResponseRedirect, Http404
+from django.urls import reverse
+from .models import Document, Folder
+from django.utils.text import slugify
+import os
+from django.conf import settings
 
 @login_required(login_url='login')
 def home(request):
@@ -134,3 +140,161 @@ def create_folder(request):
         form = FolderForm()
     
     return render(request, 'files/create_folder.html', {'form': form})
+
+
+@login_required(login_url='login')
+def delete_document(request, doc_id):
+    """
+    Vue sécurisée pour la suppression d'un document.
+    Seul le propriétaire du document peut le supprimer.
+    """
+    # Récupérer le document seulement s'il appartient à l'utilisateur connecté
+    doc = Document.objects.filter(owner=request.user, id=doc_id).first()
+    
+    # Vérifier si le document existe et appartient à l'utilisateur
+    if not doc:
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à supprimer ce document.")
+    
+    # Supprimer le document
+    doc.delete()
+    messages.success(request, "Le document a été supprimé avec succès.")
+    return HttpResponseRedirect(reverse('home'))
+
+
+@login_required(login_url='login')
+def delete_folder(request, folder_id):
+    """
+    Vue sécurisée pour la suppression d'un dossier et de son contenu.
+    Seul le propriétaire du dossier peut le supprimer.
+    """
+    # Récupérer le dossier seulement s'il appartient à l'utilisateur connecté
+    folder = Folder.objects.filter(owner=request.user, id=folder_id).first()
+    
+    # Vérifier si le dossier existe et appartient à l'utilisateur
+    if not folder:
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à supprimer ce dossier.")
+    
+    # Supprimer tous les documents du dossier puis le dossier lui-même
+    folder_name = folder.name
+    folder.documents.all().delete()
+    folder.delete()
+    
+    messages.success(request, f"Le dossier '{folder_name}' et son contenu ont été supprimés avec succès.")
+    return HttpResponseRedirect(reverse('home'))
+
+
+@login_required(login_url='login')
+def rename_document(request, document_id):
+    """
+    Vue pour renommer un document.
+    Seul le propriétaire du document peut le renommer.
+    """
+    # Récupère le document uniquement s'il appartient à l'utilisateur connecté
+    document = get_object_or_404(Document, id=document_id, owner=request.user)
+
+    if request.method == 'POST':
+        new_title = request.POST.get('title')
+        if new_title and new_title.strip():
+            document.title = new_title.strip()
+            document.save()
+            messages.success(request, "Le document a été renommé avec succès.")
+            return redirect('home')
+        else:
+            messages.error(request, "Le titre ne peut pas être vide.")
+    
+    return render(request, 'files/rename_document.html', {'document': document})
+
+
+@login_required(login_url='login')
+def rename_folder(request, folder_id):
+    """
+    Vue pour renommer un dossier.
+    Seul le propriétaire du dossier peut le renommer.
+    """
+    # Récupère le dossier uniquement s'il appartient à l'utilisateur connecté
+    folder = get_object_or_404(Folder, id=folder_id, owner=request.user)
+
+    if request.method == 'POST':
+        new_name = request.POST.get('name')
+        if new_name and new_name.strip():
+            folder.name = new_name.strip()
+            folder.save()
+            messages.success(request, "Le dossier a été renommé avec succès.")
+            return redirect('home')
+        else:
+            messages.error(request, "Le nom ne peut pas être vide.")
+    
+    return render(request, 'files/rename_folder.html', {'folder': folder})
+
+
+@login_required(login_url='login')
+def view_folder(request, folder_id):
+    """
+    Vue pour afficher le contenu d'un dossier spécifique.
+    Seul le propriétaire du dossier peut le consulter.
+    """
+    folder = get_object_or_404(Folder, id=folder_id)
+    
+    # Vérifier que l'utilisateur est le propriétaire du dossier
+    if folder.owner != request.user:
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à accéder à cette ressource.")
+    
+    # Récupérer les documents du dossier
+    documents = Document.objects.filter(folder=folder, owner=request.user)
+    
+    return render(request, 'files/folder_detail.html', {
+        'folder': folder,
+        'documents': documents
+    })
+
+
+@login_required(login_url='login')
+def move_document(request, document_id):
+    """
+    Vue pour déplacer un document d'un dossier à un autre.
+    Seul le propriétaire du document peut le déplacer.
+    """
+    document = get_object_or_404(Document, id=document_id)
+    
+    # Vérifier que l'utilisateur est le propriétaire du document
+    if document.owner != request.user:
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à accéder à cette ressource.")
+    
+    if request.method == 'POST':
+        folder_id = request.POST.get('folder')
+        
+        # Si l'utilisateur a sélectionné 'Aucun dossier' (valeur vide)
+        if folder_id == '':
+            document.folder = None
+            document.save()
+            messages.success(request, f'Le document a été déplacé vers la racine avec succès.')
+            return redirect('home')
+        
+        # Vérifier que le dossier de destination appartient bien à l'utilisateur
+        try:
+            folder = Folder.objects.get(id=folder_id, owner=request.user)
+            document.folder = folder
+            document.save()
+            
+            messages.success(
+                request, 
+                f"Le document « {document.title} » a été déplacé vers le dossier « {folder.name} »."
+            )
+            return redirect('home')
+            
+        except Exception as e:
+            # En cas d'erreur inattendue
+            messages.error(
+                request, 
+                f"Une erreur s'est produite lors du déplacement du document : {str(e)}"
+            )
+            return redirect('home')
+
+    # GET : Affiche le formulaire de déplacement
+    folders = Folder.objects.filter(owner=request.user).exclude(id=document.folder.id if document.folder else None)
+    
+    return render(request, 'files/move_document.html', {
+        'document': document,
+        'folders': folders,
+        'current_folder': current_folder
+    })

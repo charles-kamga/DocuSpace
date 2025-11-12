@@ -1,0 +1,243 @@
+{% extends 'files/base.html' %}
+{% load static %}
+
+{% block title %}Déplacer un document - DocuSpace{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card fade-in">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-arrows-alt me-3"></i>
+                    <h2 class="h5 mb-0">Déplacer le document</h2>
+                </div>
+            </div>
+            
+            <div class="card-body p-4">
+                <!-- Carte d'aperçu du document -->
+                <div class="document-preview mb-4 p-3 bg-light rounded-3">
+                    <div class="d-flex align-items-center">
+                        <div class="file-icon me-3">
+                            <i class="fas {{ document.file.url|lower|yesno:'fa-file-pdf text-danger,fa-file-alt text-primary' }}" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <div class="file-details">
+                            <h3 class="h5 mb-1">{{ document.title }}</h3>
+                            <div class="file-meta text-muted small">
+                                <div class="d-flex flex-wrap gap-3">
+                                    <span class="d-flex align-items-center">
+                                        <i class="fas {{ document.folder|yesno:'fa-folder,fa-home' }} me-1"></i>
+                                        {% if document.folder %}
+                                            Dossier actuel : <strong class="ms-1">{{ document.folder.name }}</strong>
+                                        {% else %}
+                                            <span class="ms-1">Racine (pas de dossier)</span>
+                                        {% endif %}
+                                    </span>
+                                    <span class="d-flex align-items-center">
+                                        <i class="far fa-calendar-alt me-1"></i>
+                                        Ajouté le {{ document.uploaded_at|date:"d/m/Y à H:i" }}
+                                    </span>
+                                    <span class="d-flex align-items-center">
+                                        <i class="far fa-file me-1"></i>
+                                        {{ document.file.size|filesizeformat }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulaire de déplacement -->
+                <form method="POST" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="folder" class="form-label fw-bold d-flex align-items-center">
+                            <i class="fas fa-folder-open me-2 text-primary"></i>
+                            <span>Nouvel emplacement</span>
+                        </label>
+                        
+                        <div class="input-group input-group-lg mb-2">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" id="folderSearch" class="form-control form-control-lg" 
+                                   placeholder="Rechercher un dossier..." autocomplete="off">
+                        </div>
+                        
+                        <select name="folder" id="folder" class="form-select form-select-lg" required
+                                aria-label="Sélectionnez un dossier de destination">
+                            <option value="">-- Déplacer vers la racine --</option>
+                            {% for folder in folders %}
+                                <option value="{{ folder.id }}" 
+                                        data-folder-name="{{ folder.name|lower }}"
+                                        {% if folder == document.folder %}disabled{% endif %}>
+                                    {% if folder == document.folder %}
+                                        <i class="fas fa-arrow-right me-2"></i> {{ folder.name }} (dossier actuel)
+                                    {% else %}
+                                        <i class="far fa-folder me-2"></i> {{ folder.name }}
+                                    {% endif %}
+                                </option>
+                            {% empty %}
+                                <option value="" disabled>
+                                    <i class="fas fa-exclamation-circle me-2"></i> Aucun dossier disponible
+                                </option>
+                            {% endfor %}
+                        </select>
+                        
+                        <div class="form-text mt-2 d-flex align-items-center">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>
+                            <span>Sélectionnez un dossier ou laissez vide pour déplacer vers la racine de votre espace.</span>
+                        </div>
+                        
+                        <div class="invalid-feedback d-flex align-items-center mt-2">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Veuillez sélectionner une destination valide.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-4">
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary px-4">
+                            <i class="fas fa-times me-2"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-check me-2"></i> Confirmer le déplacement
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .document-preview {
+        background-color: rgba(111, 66, 193, 0.05);
+        border-left: 4px solid var(--primary-color);
+        transition: all 0.3s ease;
+    }
+    
+    .document-preview:hover {
+        box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.05);
+    }
+    
+    .file-icon {
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .file-details {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .file-meta i {
+        width: 16px;
+        text-align: center;
+    }
+    
+    /* Animation pour la recherche */
+    @keyframes fadeInUp {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .fade-in {
+        animation: fadeInUp 0.3s ease-out forwards;
+    }
+    
+    /* Style pour les options de sélection */
+    select option {
+        padding: 0.5rem 1rem;
+    }
+    
+    select option:disabled {
+        color: #6c757d;
+        background-color: #f8f9fa;
+    }
+    
+    /* Amélioration du focus pour l'accessibilité */
+    select:focus, button:focus, a:focus {
+        box-shadow: 0 0 0 0.25rem rgba(111, 66, 193, 0.25) !important;
+        outline: none;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Validation du formulaire côté client
+(function () {
+    'use strict';
+    
+    // Fonction de validation personnalisée
+    function validateForm(form) {
+        const select = form.querySelector('#folder');
+        if (!select || select.value === '') {
+            // Si c'est vide mais qu'on a des options valides, c'est que l'utilisateur a choisi la racine
+            const hasValidOptions = Array.from(select.options).some(opt => opt.value && !opt.disabled);
+            if (hasValidOptions) {
+                select.setCustomValidity('');
+                return true;
+            }
+            select.setCustomValidity('Veuillez sélectionner une destination valide.');
+            return false;
+        }
+        select.setCustomValidity('');
+        return true;
+    }
+    
+    // Désactive la soumission du formulaire si des champs invalides sont détectés
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.needs-validation');
+        const folderSelect = document.getElementById('folder');
+        const folderSearch = document.getElementById('folderSearch');
+        
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                if (!validateForm(this)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                this.classList.add('was-validated');
+            }, false);
+            
+            // Validation en temps réel
+            if (folderSelect) {
+                folderSelect.addEventListener('change', function() {
+                    validateForm(form);
+                });
+            }
+        }
+        
+        // Filtrage des dossiers par recherche
+        if (folderSearch && folderSelect) {
+            folderSearch.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const options = folderSelect.querySelectorAll('option');
+                
+                options.forEach(option => {
+                    if (!option.value) return; // Ne pas filtrer l'option de la racine
+                    const folderName = option.textContent.toLowerCase();
+                    option.style.display = folderName.includes(searchTerm) ? 'block' : 'none';
+                });
+            });
+            
+            // Focus sur le champ de recherche au chargement
+            folderSearch.focus();
+        }
+        
+        // Animation de chargement
+        document.body.classList.add('loaded');
+    });
+})();
+</script>
+{% endblock %}

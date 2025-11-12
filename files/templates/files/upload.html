@@ -1,28 +1,85 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Uploader un document</title>
-</head>
-<body>
-    <h1>Uploader un document</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <label for="title">Titre :</label>
-        <input type="text" name="title" required><br><br>
+{% extends 'files/base.html' %}
 
-        <label for="folder">Dossier :</label>
-        <select name="folder">
-            <option value="">-- Aucun dossier --</option>
-            {% for folder in folders %}
-                <option value="{{ folder.id }}">{{ folder.name }}</option>
-            {% endfor %}
-        </select><br><br>
+{% block title %}Téléverser un document{% endblock %}
 
-        <input type="file" name="file" required><br><br>
-        <button type="submit">Uploader</button>
-    </form>
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-upload text-primary me-2"></i>Téléverser un document
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="title" class="form-label">Titre du document</label>
+                            <input type="text" class="form-control form-control-lg" id="title" name="title" required 
+                                   placeholder="Donnez un nom à votre document">
+                            <div class="invalid-feedback">
+                                Veuillez saisir un titre pour le document.
+                            </div>
+                        </div>
 
-    <a href="{% url 'home' %}">Retour à l'accueil</a>
-</body>
-</html>
+                        <div class="mb-4">
+                            <label for="folder" class="form-label">Dossier de destination</label>
+                            <select class="form-select form-select-lg" id="folder" name="folder">
+                                <option value="" selected>-- Aucun dossier (racine) --</option>
+                                {% for folder in folders %}
+                                    <option value="{{ folder.id }}">{{ folder.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="file" class="form-label">Fichier à téléverser</label>
+                            <input class="form-control form-control-lg" type="file" id="file" name="file" required>
+                            <div class="form-text">Taille maximale : 10 Mo</div>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner un fichier à téléverser.
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload me-1"></i> Téléverser
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Validation des champs du formulaire
+(function () {
+    'use strict'
+    
+    // Récupérer tous les formulaires auxquels nous voulons appliquer le style de validation Bootstrap
+    var forms = document.querySelectorAll('.needs-validation')
+    
+    // Boucle sur les champs et empêcher la soumission
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}
