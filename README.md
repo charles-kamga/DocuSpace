@@ -102,14 +102,10 @@ DocuSpace/
 └── requirements.txt     # Dépendances Python
 ```
 
-## 📄 Licence
-
-Ce projet est sous licence [MIT](LICENSE).
-
 ## 👥 Contribution
 
 Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou une pull request.
 
 ## 📧 Contact
 
-Pour toute question, contactez [votre email] ou ouvrez une issue sur GitHub.
+Pour toute question, contactez charleskamgapr@gmail.com ou ouvrez une issue sur GitHub.
