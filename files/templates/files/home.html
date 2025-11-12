@@ -16,16 +16,12 @@
             <li>Aucun document dans ce dossier.</li>
         {% endfor %}
     </ul>
-{% empty %}
-    <p>Aucun dossier pour le moment.</p>
 {% endfor %}
 
 <h2>📄 Documents sans dossier</h2>
 <ul>
-    {% for doc in documents %}
-        {% if not doc.folder %}
-            <li>{{ doc.title }} - <a href="{{ doc.file.url }}">Télécharger</a></li>
-        {% endif %}
+    {% for doc in documents_without_folder %}
+        <li>{{ doc.title }} - <a href="{{ doc.file.url }}">Télécharger</a></li>
     {% empty %}
         <li>Aucun document.</li>
     {% endfor %}

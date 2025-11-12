@@ -10,9 +10,22 @@ class Folder(models.Model):
         return self.name
 
 
+def document_upload_path(instance, filename):
+    # Cette fonction génère un chemin unique pour chaque fichier
+    import os
+    from django.utils.text import slugify
+    from time import time
+    
+    # Récupère l'extension du fichier
+    ext = filename.split('.')[-1]
+    # Crée un nom de fichier unique avec un timestamp
+    filename = f"{slugify(instance.title)}_{int(time())}.{ext}"
+    # Retourne le chemin complet avec le sous-dossier 'documents'
+    return os.path.join('documents', filename)
+
 class Document(models.Model):
     title = models.CharField(max_length=200)
-    file = models.FileField(upload_to='documents/')
+    file = models.FileField(upload_to=document_upload_path)
     folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name='documents', null=True, blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documents')
     uploaded_at = models.DateTimeField(auto_now_add=True)
@@ -20,3 +33,11 @@ class Document(models.Model):
     def __str__(self):
         return self.title
 
+
+def home(request):
+    folders = Folder.objects.filter(owner=request.user)
+    documents_without_folder = Document.objects.filter(owner=request.user, folder__isnull=True)
+    return render(request, 'files/home.html', {
+        'folders': folders,
+        'documents_without_folder': documents_without_folder
+    })
