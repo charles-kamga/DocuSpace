@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>DocuSpace - Accueil</title>
+</head>
+<body>
+<h1>📁 Mes Dossiers</h1>
+
+{% for folder in folders %}
+    <h2>{{ folder.name }}</h2>
+    <ul>
+        {% for doc in folder.documents.all %}
+            <li>{{ doc.title }} - <a href="{{ doc.file.url }}">Télécharger</a></li>
+        {% empty %}
+            <li>Aucun document dans ce dossier.</li>
+        {% endfor %}
+    </ul>
+{% empty %}
+    <p>Aucun dossier pour le moment.</p>
+{% endfor %}
+
+<h2>📄 Documents sans dossier</h2>
+<ul>
+    {% for doc in documents %}
+        {% if not doc.folder %}
+            <li>{{ doc.title }} - <a href="{{ doc.file.url }}">Télécharger</a></li>
+        {% endif %}
+    {% empty %}
+        <li>Aucun document.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'create_folder' %}">+ Créer un nouveau dossier</a><br>
+<a href="{% url 'upload_document' %}">Uploader un document</a>
+
+</body>
+</html>

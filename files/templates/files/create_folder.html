@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Créer un dossier</title>
+</head>
+<body>
+    <h1>Créer un nouveau dossier</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Créer</button>
+    </form>
+    <a href="{% url 'home' %}">Retour à l'accueil</a>
+</body>
+</html>

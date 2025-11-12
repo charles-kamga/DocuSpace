@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Uploader un document</title>
+</head>
+<body>
+    <h1>Uploader un document</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="title">Titre :</label>
+        <input type="text" name="title" required><br><br>
+
+        <label for="folder">Dossier :</label>
+        <select name="folder">
+            <option value="">-- Aucun dossier --</option>
+            {% for folder in folders %}
+                <option value="{{ folder.id }}">{{ folder.name }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <input type="file" name="file" required><br><br>
+        <button type="submit">Uploader</button>
+    </form>
+
+    <a href="{% url 'home' %}">Retour à l'accueil</a>
+</body>
+</html>
