@@ -32,12 +32,3 @@ class Document(models.Model):
 
     def __str__(self):
         return self.title
-
-
-def home(request):
-    folders = Folder.objects.filter(owner=request.user)
-    documents_without_folder = Document.objects.filter(owner=request.user, folder__isnull=True)
-    return render(request, 'files/home.html', {
-        'folders': folders,
-        'documents_without_folder': documents_without_folder
-    })

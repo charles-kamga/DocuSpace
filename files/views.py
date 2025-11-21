@@ -92,7 +92,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            messages.success(request, f"Bienvenue, {user.username} !")
+            messages.success(request, f"Bienvenue, {user.username} Dans votre espace Document !")
             return redirect('home')
     else:
         form = AuthenticationForm()
@@ -123,22 +123,18 @@ class FolderForm(forms.ModelForm):
 
 @login_required(login_url='login')
 def create_folder(request):
-    """
-    Vue sécurisée pour la création de dossiers.
-    Chaque dossier créé est automatiquement associé à l'utilisateur connecté.
-    """
     if request.method == 'POST':
         form = FolderForm(request.POST)
         if form.is_valid():
-            # Création du dossier avec l'utilisateur connecté comme propriétaire
             folder = form.save(commit=False)
-            folder.owner = request.user  # Sécurité : association automatique à l'utilisateur connecté
+            folder.owner = request.user
+            # Plus de logique de parent ici
             folder.save()
             messages.success(request, f"Le dossier '{folder.name}' a été créé avec succès !")
             return redirect('home')
     else:
         form = FolderForm()
-    
+
     return render(request, 'files/create_folder.html', {'form': form})
 
 
@@ -229,22 +225,18 @@ def rename_folder(request, folder_id):
 
 @login_required(login_url='login')
 def view_folder(request, folder_id):
-    """
-    Vue pour afficher le contenu d'un dossier spécifique.
-    Seul le propriétaire du dossier peut le consulter.
-    """
     folder = get_object_or_404(Folder, id=folder_id)
-    
-    # Vérifier que l'utilisateur est le propriétaire du dossier
+
     if folder.owner != request.user:
-        return HttpResponseForbidden("Vous n'êtes pas autorisé à accéder à cette ressource.")
-    
-    # Récupérer les documents du dossier
+        return HttpResponseForbidden("Interdit.")
+
+    # On ne récupère que les documents, plus les sous-dossiers
     documents = Document.objects.filter(folder=folder, owner=request.user)
-    
+
     return render(request, 'files/folder_detail.html', {
         'folder': folder,
         'documents': documents
+        # On a retiré 'subfolders'
     })
 
 
@@ -291,6 +283,8 @@ def move_document(request, document_id):
             return redirect('home')
 
     # GET : Affiche le formulaire de déplacement
+    # Définition du dossier courant du document
+    current_folder = document.folder
     folders = Folder.objects.filter(owner=request.user).exclude(id=document.folder.id if document.folder else None)
     
     return render(request, 'files/move_document.html', {
