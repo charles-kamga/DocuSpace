@@ -1,5 +1,5 @@
 """
-WSGI config for DocuSapce project.
+WSGI config for DocuSpace project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

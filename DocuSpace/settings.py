@@ -27,9 +27,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-ta-cle-locale-par-def
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*'] # On autorisera l'URL de Render ici plus tard
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*'] #on auttorise toutes les adresses pour eviter les bloquages 400
 
 
 # Application definition
