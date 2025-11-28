@@ -18,8 +18,8 @@ def home(request):
     Vue sécurisée pour la page d'accueil.
     Affiche uniquement les dossiers et documents de l'utilisateur connecté.
     """
-    # Récupère uniquement les dossiers appartenant à l'utilisateur connecté
-    folders = Folder.objects.filter(owner=request.user)
+    # Récupère uniquement les dossiers racine (sans parent) appartenant à l'utilisateur connecté
+    folders = Folder.objects.filter(owner=request.user, parent__isnull=True)
 
     # Récupère uniquement les documents sans dossier appartenant à l'utilisateur connecté
     documents_without_folder = Document.objects.filter(owner=request.user, folder__isnull=True)
@@ -123,19 +123,29 @@ class FolderForm(forms.ModelForm):
 
 @login_required(login_url='login')
 def create_folder(request):
+    parent_id = request.GET.get('parent')
+    parent_folder = None
+    if parent_id:
+        parent_folder = get_object_or_404(Folder, id=parent_id, owner=request.user)
+    
     if request.method == 'POST':
         form = FolderForm(request.POST)
         if form.is_valid():
             folder = form.save(commit=False)
             folder.owner = request.user
-            # Plus de logique de parent ici
+            folder.parent = parent_folder
             folder.save()
             messages.success(request, f"Le dossier '{folder.name}' a été créé avec succès !")
+            if parent_folder:
+                return redirect('view_folder', folder_id=parent_folder.id)
             return redirect('home')
     else:
         form = FolderForm()
 
-    return render(request, 'files/create_folder.html', {'form': form})
+    return render(request, 'files/create_folder.html', {
+        'form': form,
+        'parent_folder': parent_folder
+    })
 
 
 @login_required(login_url='login')
@@ -230,13 +240,14 @@ def view_folder(request, folder_id):
     if folder.owner != request.user:
         return HttpResponseForbidden("Interdit.")
 
-    # On ne récupère que les documents, plus les sous-dossiers
+    # Récupère les documents et les sous-dossiers
     documents = Document.objects.filter(folder=folder, owner=request.user)
+    subfolders = Folder.objects.filter(parent=folder, owner=request.user)
 
     return render(request, 'files/folder_detail.html', {
         'folder': folder,
-        'documents': documents
-        # On a retiré 'subfolders'
+        'documents': documents,
+        'subfolders': subfolders
     })
 
 

@@ -19,8 +19,8 @@
             <i class="fas fa-folder-open text-warning me-2"></i> {{ folder.name }}
         </h1>
         <div class="dropdown">
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                    id="folderActions" data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="folderActions"
+                data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-ellipsis-v"></i> Actions
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="folderActions">
@@ -29,11 +29,12 @@
                         <i class="fas fa-edit me-2 text-primary"></i>Renommer ce dossier
                     </a>
                 </li>
-                <li><hr class="dropdown-divider"></li>
                 <li>
-                    <a class="dropdown-item text-danger"
-                       href="{% url 'delete_folder' folder.id %}"
-                       data-confirm="Êtes-vous sûr de vouloir supprimer ce dossier et tout son contenu ?">
+                    <hr class="dropdown-divider">
+                </li>
+                <li>
+                    <a class="dropdown-item text-danger" href="{% url 'delete_folder' folder.id %}"
+                        data-confirm="Êtes-vous sûr de vouloir supprimer ce dossier et tout son contenu ?">
                         <i class="fas fa-trash-alt me-2"></i>Supprimer ce dossier
                     </a>
                 </li>
@@ -41,6 +42,40 @@
         </div>
     </div>
 
+    <!-- Liste des sous-dossiers -->
+    {% if subfolders %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                <i class="fas fa-folder text-warning me-2"></i> Sous-dossiers
+                <span class="badge bg-secondary ms-2">{{ subfolders|length }}</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                {% for subfolder in subfolders %}
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-folder text-warning me-2"></i>
+                                    <a href="{% url 'view_folder' subfolder.id %}" class="text-decoration-none">
+                                        {{ subfolder.name }}
+                                    </a>
+                                </h6>
+                            </div>
+                            <p class="card-text small text-muted">
+                                {{ subfolder.documents.count }} document{{ subfolder.documents.count|pluralize }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Liste des documents du dossier -->
     <div class="card shadow-sm mb-4">
@@ -78,7 +113,8 @@
                     {% for doc in documents %}
                     <tr>
                         <td class="text-center">
-                            <i class="fas {{ doc.file.url|lower|yesno:'fa-file-pdf text-danger,fa-file-alt text-primary' }} fa-lg"></i>
+                            <i
+                                class="fas {{ doc.file.url|lower|yesno:'fa-file-pdf text-danger,fa-file-alt text-primary' }} fa-lg"></i>
                         </td>
                         <td>
                             <div class="fw-bold text-truncate" style="max-width: 300px;" title="{{ doc.title }}">
@@ -94,25 +130,24 @@
                         <td class="text-end">
                             <div class="btn-group" role="group">
                                 <a href="{{ doc.file.url }}" target="_blank" class="btn btn-sm btn-outline-secondary"
-                                   data-bs-toggle="tooltip" title="Ouvrir">
+                                    data-bs-toggle="tooltip" title="Ouvrir">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <a href="{{ doc.file.url }}" download class="btn btn-sm btn-outline-secondary"
-                                   data-bs-toggle="tooltip" title="Télécharger">
+                                    data-bs-toggle="tooltip" title="Télécharger">
                                     <i class="fas fa-download"></i>
                                 </a>
                                 <a href="{% url 'move_document' doc.id %}" class="btn btn-sm btn-outline-secondary"
-                                   data-bs-toggle="tooltip" title="Déplacer">
+                                    data-bs-toggle="tooltip" title="Déplacer">
                                     <i class="fas fa-arrows-alt"></i>
                                 </a>
                                 <a href="{% url 'rename_document' doc.id %}" class="btn btn-sm btn-outline-secondary"
-                                   data-bs-toggle="tooltip" title="Renommer">
+                                    data-bs-toggle="tooltip" title="Renommer">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{% url 'delete_document' doc.id %}"
-                                   class="btn btn-sm btn-outline-danger"
-                                   data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"
-                                   data-bs-toggle="tooltip" title="Supprimer">
+                                <a href="{% url 'delete_document' doc.id %}" class="btn btn-sm btn-outline-danger"
+                                    data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"
+                                    data-bs-toggle="tooltip" title="Supprimer">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             </div>
@@ -143,21 +178,21 @@
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
 
-    // Confirmations
-    document.querySelectorAll('[data-confirm]').forEach(function(element) {
-        element.addEventListener('click', function(e) {
-            if (!confirm(this.getAttribute('data-confirm'))) {
-                e.preventDefault();
-            }
+        // Confirmations
+        document.querySelectorAll('[data-confirm]').forEach(function (element) {
+            element.addEventListener('click', function (e) {
+                if (!confirm(this.getAttribute('data-confirm'))) {
+                    e.preventDefault();
+                }
+            });
         });
     });
-});
 </script>
 {% endblock %}
