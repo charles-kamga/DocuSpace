@@ -73,3 +73,6 @@ package.json
 
 # Dossiers de migrations compilés
 */migrations/__pycache__/
+
+# Documentation de déploiement
+DEPLOY.md

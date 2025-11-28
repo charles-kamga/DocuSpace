@@ -1,7 +1,7 @@
 # 📁 DocuSpace
 
 [![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/Django-5.2.8-092E20.svg?logo=django)](https://www.djangoproject.com/)
+[![Django](https://img.shields.io/badge/Django-4.2.26-092E20.svg?logo=django)](https://www.djangoproject.com/)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3.2-7952B3.svg?logo=bootstrap)](https://getbootstrap.com/)
 
 DocuSpace est une application web de gestion de documents qui permet de stocker, organiser et gérer facilement vos fichiers en ligne avec une interface utilisateur moderne et intuitive.
@@ -30,7 +30,7 @@ DocuSpace est une application web de gestion de documents qui permet de stocker,
 
 ### Backend
 - Python 3.12+
-- Django 5.2.8
+- Django 4.2.26
 - Django Crispy Forms
 - Pillow (traitement d'images)
 
