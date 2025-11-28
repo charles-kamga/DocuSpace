@@ -134,22 +134,25 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Configuration des médias
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# Configuration des fichiers statiques
+# Configuration des fichiers Statiques (CSS, JS, Images)
 STATIC_URL = '/static/'
+
+# Où sont tes fichiers statiques sur ton PC ?
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'files/static'),
 ]
 
-# Configuration pour les fichiers statiques en production
+# Où Django doit-il les rassembler pour la production ? (Render)
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# Compression et mise en cache optimisée pour la prod
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' 
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+# Configuration WhiteNoise (Version tolérante "Cool")
+# C'est celle-ci qu'il faut utiliser en production pour éviter les erreurs 500
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+# Configuration des Médias (Uploads utilisateurs)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Configuration Cloudinary
 CLOUDINARY_STORAGE = {
@@ -158,16 +161,14 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# Utiliser Cloudinary uniquement en production
+# Logique de stockage : Cloudinary en Prod, Local en Dev
 if not DEBUG:
+    # En production (Render)
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 else:
-    # En développement, utiliser le stockage local
+    # En développement (Local)
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# Configuration pour les icônes Font Awesome
+# Autres configs
 FONTAWESOME_5_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'
 FONTAWESOME_5_PREFIX = 'fa'
