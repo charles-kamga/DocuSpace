@@ -33,9 +33,8 @@ ALLOWED_HOSTS = ['*'] #on auttorise toutes les adresses pour eviter les bloquage
 # Application definition
 
 INSTALLED_APPS = [
-    
-    'cloudinary_storage', 
     'django.contrib.staticfiles',
+    'cloudinary_storage', 
     'cloudinary',  
     'django.contrib.admin',
     'django.contrib.auth',
