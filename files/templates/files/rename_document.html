@@ -15,20 +15,19 @@
                 <div class="card-body">
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        
+
                         {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert alert-{{ message.tags }}">
-                                    <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
-                                </div>
-                            {% endfor %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
+                        </div>
+                        {% endfor %}
                         {% endif %}
-                        
+
                         <div class="mb-4">
-                            <label for="new_name" class="form-label">Nouveau nom</label>
-                            <input type="text" class="form-control form-control-lg" id="new_name" name="new_name" 
-                                   value="{{ document.title }}" required 
-                                   placeholder="Entrez le nouveau nom du document">
+                            <label for="title" class="form-label">Nouveau nom</label>
+                            <input type="text" class="form-control form-control-lg" id="title" name="title"
+                                value="{{ document.title }}" required placeholder="Entrez le nouveau nom du document">
                             <div class="form-text">Incluez l'extension du fichier (par exemple: .pdf, .docx)</div>
                         </div>
 
@@ -50,24 +49,24 @@
 
 {% block extra_js %}
 <script>
-// Validation des champs du formulaire
-(function () {
-    'use strict'
-    
-    // Récupérer tous les formulaires auxquels nous voulons appliquer le style de validation Bootstrap
-    var forms = document.querySelectorAll('.needs-validation')
-    
-    // Boucle sur les champs et empêcher la soumission
-    Array.prototype.slice.call(forms).forEach(function (form) {
-        form.addEventListener('submit', function (event) {
-            if (!form.checkValidity()) {
-                event.preventDefault()
-                event.stopPropagation()
-            }
-            
-            form.classList.add('was-validated')
-        }, false)
-    })
-})()
+    // Validation des champs du formulaire
+    (function () {
+        'use strict'
+
+        // Récupérer tous les formulaires auxquels nous voulons appliquer le style de validation Bootstrap
+        var forms = document.querySelectorAll('.needs-validation')
+
+        // Boucle sur les champs et empêcher la soumission
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
 </script>
 {% endblock %}
