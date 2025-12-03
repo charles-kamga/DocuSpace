@@ -114,6 +114,25 @@
         </div>
     </main>
 
+    <!-- Modal de Confirmation de Suppression -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel"><i class="fas fa-exclamation-triangle text-danger me-2"></i> Confirmation Requise</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="confirmDeleteModalBody">
+                    <!-- Le message de confirmation sera injecté ici -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Confirmer la suppression</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer mt-auto">
         <div class="container">
@@ -130,7 +149,6 @@
 
     <!-- Custom JS -->
     <script>
-        // Activer les tooltips
         document.addEventListener('DOMContentLoaded', function () {
             // Tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -138,25 +156,43 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
 
-            // Activer les popovers
+            // Popovers
             var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
             popoverTriggerList.map(function (popoverTriggerEl) {
                 return new bootstrap.Popover(popoverTriggerEl);
             });
 
-            // Animations de chargement
+            // Animations
             const elements = document.querySelectorAll('.fade-in');
             elements.forEach((el, index) => {
                 el.style.animationDelay = `${index * 100}ms`;
             });
 
-            // Confirmation de suppression
-            document.querySelectorAll('[data-confirm]').forEach(element => {
-                element.addEventListener('click', function (e) {
-                    if (!confirm(this.dataset.confirm || 'Êtes-vous sûr de vouloir effectuer cette action ?')) {
+            // Gestion du Modal de Confirmation de Suppression
+            const confirmModalElement = document.getElementById('confirmDeleteModal');
+            if (confirmModalElement) {
+                const confirmModal = new bootstrap.Modal(confirmModalElement);
+                const confirmModalBody = document.getElementById('confirmDeleteModalBody');
+                const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+                document.querySelectorAll('[data-confirm]').forEach(element => {
+                    element.addEventListener('click', function (e) {
                         e.preventDefault();
-                    }
+                        const message = this.dataset.confirm || 'Êtes-vous sûr de vouloir effectuer cette action ?';
+                        const deleteUrl = this.href;
+                        confirmModalBody.textContent = message;
+                        confirmDeleteBtn.href = deleteUrl;
+                        confirmModal.show();
+                    });
                 });
+            }
+
+            // Fermeture automatique des messages de succès
+            const successAlerts = document.querySelectorAll('.alert-success');
+            successAlerts.forEach(function(alert) {
+                setTimeout(function() {
+                    new bootstrap.Alert(alert).close();
+                }, 5000); // 5 secondes
             });
         });
     </script>
