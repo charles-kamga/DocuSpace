@@ -29,6 +29,24 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*'] #on auttorise toutes les adresses pour eviter les bloquages 400
 
+# CSRF trusted origins - Fix pour erreur 403 sur mobile
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://192.168.*:8000',  # Pour accès depuis mobile sur réseau local
+    'https://*.onrender.com',  # Pour la production
+]
+
+# Si DEBUG, on accepte aussi les IP locales
+if DEBUG:
+    import socket
+    hostname = socket.gethostname()
+    local_ip = socket.gethostbyname(hostname)
+    CSRF_TRUSTED_ORIGINS.extend([
+        f'http://{local_ip}:8000',
+        f'http://0.0.0.0:8000',
+    ])
+
 
 # Application definition
 

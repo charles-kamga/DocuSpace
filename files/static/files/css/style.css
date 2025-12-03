@@ -1059,6 +1059,46 @@ li {
     }
 }
 
+/* ============================================
+   CRITICAL: Disable heavy animations on mobile
+   ============================================ */
+@media (max-width: 768px) {
+
+    /* Disable ALL gradient layers to prevent GPU overload and overheating */
+    body::before,
+    body::after,
+    .gradient-layer-3,
+    .gradient-layer-4,
+    .gradient-layer-5,
+    .gradient-layer-6 {
+        display: none !important;
+    }
+
+    /* Simple static background for mobile */
+    body {
+        background: linear-gradient(180deg,
+                #0a0e1a 0%,
+                #111827 50%,
+                #0a0e1a 100%) !important;
+    }
+
+    /* Reduce blur on remaining elements */
+    .navbar,
+    .footer,
+    .card,
+    .modal-content,
+    .dropdown-menu {
+        backdrop-filter: blur(8px) saturate(120%) !important;
+        -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
+    }
+
+    .form-control,
+    .form-select {
+        backdrop-filter: blur(6px) saturate(120%) !important;
+        -webkit-backdrop-filter: blur(6px) saturate(120%) !important;
+    }
+}
+
 /* Small devices (phones, less than 576px) */
 @media (max-width: 576px) {
 
