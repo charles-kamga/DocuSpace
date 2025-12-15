@@ -1,32 +1,28 @@
 # 📁 DocuSpace
 
-[![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/Django-4.2.26-092E20.svg?logo=django)](https://www.djangoproject.com/)
-[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3.2-7952B3.svg?logo=bootstrap)](https://getbootstrap.com/)
-
 DocuSpace est une application web de gestion de documents qui permet de stocker, organiser et gérer facilement vos fichiers en ligne avec une interface utilisateur moderne et intuitive.
 
-## ✨ Fonctionnalités
+## Fonctionnalités
 
-### 📂 Gestion des dossiers
+### Gestion des dossiers
 - Création de dossiers personnalisés
 - Organisation hiérarchique des documents
 - Renommage et suppression sécurisée
 - Affichage du contenu des dossiers
 
-### 📄 Gestion des documents
+### Gestion des documents
 - Upload multiple de fichiers
 - Prévisualisation des fichiers
 - Téléchargement et ouverture directe
 - Déplacement entre les dossiers
 - Renommage et suppression sécurisée
 
-### 👤 Gestion des utilisateurs
+### Gestion des utilisateurs
 - Inscription et authentification
 - Espace personnel sécurisé
 - Séparation des données par utilisateur
 
-## 🚀 Technologies utilisées
+## Technologies utilisées
 
 ### Backend
 - Python 3.12+
@@ -82,7 +78,7 @@ DocuSpace est une application web de gestion de documents qui permet de stocker,
    - Site web: http://127.0.0.1:8000/
    - Admin: http://127.0.0.1:8000/admin/
 
-## 📝 Structure du projet
+## Structure du projet
 
 ```
 DocuSpace/
@@ -102,10 +98,6 @@ DocuSpace/
 └── requirements.txt     # Dépendances Python
 ```
 
-## 👥 Contribution
+## Contribution
 
 Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou une pull request.
-
-## 📧 Contact
-
-Pour toute question, contactez charleskamgapr@gmail.com ou ouvrez une issue sur GitHub.
